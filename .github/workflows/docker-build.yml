@@ -107,9 +107,9 @@ jobs:
     - name: Save Docker image
       run: |
         docker save sugar > sugar.tar
-        
+
     - name: Upload Docker image artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: sugar-docker-image
         path: sugar.tar
