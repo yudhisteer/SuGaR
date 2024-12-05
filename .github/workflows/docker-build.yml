@@ -206,16 +206,22 @@ jobs:
         docker rm -f sugar_conda
 
     # Third stage: Install PyTorch and basic dependencies
-    - name: Install PyTorch and dependencies
+    - name: Install PyTorch dependencies
       run: |
-        docker run --name sugar_pytorch -d sugar:anaconda tail -f /dev/null
+        docker run --memory=24g --name sugar_pytorch -d sugar:anaconda tail -f /dev/null
         docker exec sugar_pytorch bash -c '
           /root/anaconda3/bin/conda create -n sugar python=3.9 -y &&
-          /root/anaconda3/bin/conda run -n sugar conda install pytorch==2.0.1 torchvision==0.15.2 torchaudio==2.0.2 pytorch-cuda=11.8 -c pytorch -c nvidia -y &&
-          /root/anaconda3/bin/conda run -n sugar conda install -c fvcore -c iopath -c conda-forge fvcore iopath -y &&
-          /root/anaconda3/bin/conda run -n sugar conda install pytorch3d==0.7.4 -c pytorch3d -y'
-        docker commit sugar_pytorch sugar:pytorch
+          /root/anaconda3/bin/conda run -n sugar conda install pytorch==2.0.1 -c pytorch -c nvidia -y'
+        docker commit sugar_pytorch sugar:pytorch_base
         docker rm -f sugar_pytorch
+
+    - name: Install PyTorch Vision and Audio
+      run: |
+        docker run --name sugar_pytorch_extra -d sugar:pytorch_base tail -f /dev/null
+        docker exec sugar_pytorch_extra bash -c '
+          /root/anaconda3/bin/conda run -n sugar conda install torchvision==0.15.2 torchaudio==2.0.2 -c pytorch -c nvidia -y'
+        docker commit sugar_pytorch_extra sugar:pytorch_complete
+        docker rm -f sugar_pytorch_extra
 
     # Fourth stage: Install remaining packages
     - name: Install remaining packages
