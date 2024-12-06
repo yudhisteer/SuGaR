@@ -131,6 +131,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+
+    # Add disk cleanup here
+    - name: Free disk space
+      run: |
+        df -h
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /usr/local/lib/android
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo docker image prune -af
+        df -h
+
     # Create Dockerfile with COLMAP
     - name: Create Dockerfile
       run: |
@@ -204,6 +216,7 @@ jobs:
           source ~/.bashrc'
         docker commit sugar_conda sugar:anaconda
         docker rm -f sugar_conda
+        docker image rm sugar  # Remove the base image after we're done with it
 
     # Third stage: Install PyTorch and basic dependencies
     - name: Install PyTorch dependencies
