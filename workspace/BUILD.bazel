@@ -1,0 +1,16 @@
+load("@rules_oci//oci:defs.bzl", "oci_image", "oci_push")
+
+# Define the image
+oci_image(
+    name = "sugar_image",
+    base = "@ubuntu_22_04//image",
+    tars = ["sugar.tar"],
+)
+
+# Push the image
+oci_push(
+    name = "push_sugar_image",
+    image = ":sugar_image",
+    repository = "index.docker.io/yuvish01/sugar-gpu",
+    remote_tags = ["latest"]
+)
