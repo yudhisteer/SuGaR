@@ -1,13 +1,20 @@
 FROM yuvish01/sugar:latest
 USER root
+# Add NVIDIA runtime dependencies
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility,graphics
+
+# Add OpenGL/EGL dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-   build-essential cmake ninja-build git libboost-all-dev \
-   libeigen3-dev libflann-dev libfreeimage-dev libgoogle-glog-dev \
-   libgtest-dev libsqlite3-dev libglew-dev qtbase5-dev \
-   libqt5opengl5-dev libcgal-dev libceres-dev libopencv-dev \
-   libglfw3-dev freeglut3-dev libmetis-dev libassimp-dev \
-   libgtk-3-dev libavdevice-dev libavcodec-dev libxxf86vm-dev \
-   libembree-dev gcc-10 g++-10 python3 python3-pip ffmpeg \
-   libtiff-dev libtiff5 && \
-   apt-get clean && rm -rf /var/lib/apt/lists/*
-USER docker_user
+    libgl1-mesa-dev \
+    libgles2-mesa-dev \
+    libegl1-mesa-dev \
+    libxrandr-dev \
+    libxinerama-dev \
+    libxcursor-dev \
+    libxi-dev \
+    libxxf86vm-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Keep your existing CMD
+CMD ["/bin/bash"]

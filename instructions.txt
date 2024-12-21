@@ -1,0 +1,38 @@
+docker run --gpus all -it --name gs-container -v C:/Users/yudhi/Desktop/__Projects__/gaussian-splatting:/workspace/gaussian-splatting yuvish01/gs:latest
+
+docker run --gpus all -it --name gs-container \
+  -v C:/Users/yudhi/Desktop/__Projects__/gaussian-splatting:/workspace/gaussian-splatting \
+  -p 38088:38088 \
+  yuvish01/gs:latest
+
+
+docker run --gpus all -it -e DISPLAY=host.docker.internal:0.0 -v C:/Users/yudhi/Desktop/__Projects__/gaussian-splatting:/workspace/gaussian-splatting --name gs-container yuvish01/gs:latest
+
+conda init bash
+source ~/.bashrc
+conda activate gaussian_splatting
+cd SIBR_viewers
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
+cd build
+make -j$(nproc)
+./install/bin/SIBR_gaussianViewer_app --path ../output/fa75a6d9-f
+
+# Then try building again
+cd /workspace/gaussian-splatting/SIBR_viewers
+rm -rf build  # Remove the old build directory
+cmake -Bbuild -DCMAKE_BUILD_TYPE=Release .
+cd build
+make -j$(nproc)
+
+
+docker stop sugar-container && docker rm sugar-container
+conda init bash
+/bin/bash
+conda activate sugar
+
+pip install "numpy<2"
+python train_full_pipeline.py -s data/basket -r "dn_consistency" --high_poly True --export_obj True
+python train_full_pipeline.py -s data/basket -r "dn_consistency" --low_poly True --refinement_time "short" --square_size 5 --export_obj True
+
+
+docker run -it --gpus all -e NVIDIA_VISIBLE_DEVICES=all -e NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics -v C:/Users/yudhi/Desktop/__Projects__/sugar:/workspace sugar-gpu:latest
